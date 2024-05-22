@@ -1,1 +1,1 @@
-# Go Rest API from scratch using standard lib.
+# Example Repo - Go Rest API Using Only Standard Lib

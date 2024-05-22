@@ -1,0 +1,12 @@
+root: /home/knowledge/projects/go-rest-api
+exts: [go, tmp, tmpl, html]
+paths: [/home/knowledge/projects/go-rest-api]
+exclude: [.git, bin, vendor, testdata]
+delay: 100ms
+recursive: true
+log_prefix: go-rest-api
+run:
+    bin: /home/knowledge/projects/go-rest-api/bin/main
+    args: []
+build:
+    cmd: go build -o /home/knowledge/projects/go-rest-api/bin/main /home/knowledge/projects/go-rest-api
