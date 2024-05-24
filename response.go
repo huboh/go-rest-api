@@ -11,14 +11,14 @@ const (
 
 // Response represent the api response object.
 type Response struct {
-	// Code is the http response status code.
-	Code int `json:"code"`
-
 	// Status is the response status. either "success" or "error".
 	Status Status `json:"status"`
 
 	// Message is the response message. defaults to http.StatusText(Code).
 	Message string `json:"message"`
+
+	// StatusCode is the http response status code.
+	StatusCode int `json:"statusCode"`
 
 	// Data is the response data.
 	Data any `json:"data"`

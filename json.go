@@ -6,12 +6,12 @@ import (
 )
 
 func SendJson(w http.ResponseWriter, data Response) {
-	if data.Code < 100 {
-		data.Code = http.StatusOK
+	if data.StatusCode < 100 {
+		data.StatusCode = http.StatusOK
 	}
 
 	if data.Status == "" {
-		if data.Code >= 500 {
+		if data.StatusCode >= 500 {
 			data.Status = StatusError
 		} else {
 			data.Status = StatusSuccess
@@ -19,10 +19,10 @@ func SendJson(w http.ResponseWriter, data Response) {
 	}
 
 	if data.Message == "" {
-		data.Message = http.StatusText(data.Code)
+		data.Message = http.StatusText(data.StatusCode)
 	}
 
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(data.Code)
+	w.WriteHeader(data.StatusCode)
 	json.NewEncoder(w).Encode(data)
 }
