@@ -8,10 +8,6 @@ import (
 	"strings"
 )
 
-// Middleware is a function that adds additional functionality
-// to an http.Handler instance.
-type Middleware func(http.Handler) http.Handler
-
 // Route represents an api route
 type Route struct {
 	// Path is request Path
