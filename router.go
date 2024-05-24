@@ -8,7 +8,8 @@ import (
 	"strings"
 )
 
-// Middleware
+// Middleware is a function that adds additional functionality
+// to an http.Handler instance.
 type Middleware func(http.Handler) http.Handler
 
 // Route represents an api route
@@ -81,7 +82,7 @@ func (r *Router) registerRoutes() {
 		}
 
 		// map to path handler
-		r.mux.Handle(fullPath, handler)
+		r.mux.Handle(fullPath, r.registerMiddlewares(handler))
 
 		switch handler.(type) {
 		case *Router:
@@ -90,4 +91,13 @@ func (r *Router) registerRoutes() {
 			log.Printf("new handler mapped for %s\n", fullPath)
 		}
 	}
+}
+
+// registerMiddlewares registers the router middlewares
+func (r *Router) registerMiddlewares(h http.Handler) http.Handler {
+	for _, middleware := range r.Middlewares {
+		h = middleware(h)
+	}
+
+	return h
 }

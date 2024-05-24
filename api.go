@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	env "github.com/joho/godotenv"
 )
@@ -44,7 +45,9 @@ func getRoutes() []Route {
 			Method: http.MethodGet,
 			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				SendJson(w, Response{
-					Data: "active",
+					Data: map[string]any{
+						"date": time.Now().Format(time.RFC3339),
+					},
 				})
 			}),
 		},
@@ -60,5 +63,8 @@ func getRoutes() []Route {
 }
 
 func getMiddlewares() []Middleware {
-	return []Middleware{}
+	return []Middleware{
+		PanicHandlerMiddleware,
+		LoggerMiddleware,
+	}
 }
