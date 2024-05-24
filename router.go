@@ -44,7 +44,7 @@ type Router struct {
 }
 
 func NewRouter(prefix string, mws []Middleware, routes []Route) *Router {
-	router := &Router{
+	r := &Router{
 		mux:         new(http.ServeMux),
 		Prefix:      prefix,
 		Routes:      routes,
@@ -52,9 +52,9 @@ func NewRouter(prefix string, mws []Middleware, routes []Route) *Router {
 	}
 
 	// register routes
-	router.registerRoutes()
+	r.registerRoutes()
 
-	return router
+	return r
 }
 
 // ServeHTTP makes Router implements http.Handler interface
@@ -73,7 +73,7 @@ func (r *Router) registerRoutes() {
 			fullPath = strings.TrimSpace(fmt.Sprintf("%s %s", route.Method, path))
 		)
 
-		if !strings.HasSuffix(fullPath, "/") {
+		if _, ok := handler.(*Router); ok && !strings.HasSuffix(fullPath, "/") {
 			fullPath += "/"
 		}
 
