@@ -1,10 +1,13 @@
-package main
+package auth
 
 import (
 	"errors"
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/huboh/go-rest-api/internal/pkg/env"
+	"github.com/huboh/go-rest-api/internal/pkg/utils"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -64,23 +67,22 @@ type TokenConfigs struct {
 // for issuer, secrets, and expiration durations.
 func NewTokenConfigs() *TokenConfigs {
 	tc := new(TokenConfigs)
-	env := new(Env)
 	issuer := env.Get("JWT_ISSUER")
 
 	//* set id token configs
 	tc.idTokenIssuer = issuer
 	tc.idTokenSecret = []byte(env.MustGet("JWT_ID_TOKEN_SECRET"))
-	tc.idTokenExpiresAt = Must(time.ParseDuration(env.MustGet("JWT_ID_TOKEN_EXPIRATION")))
+	tc.idTokenExpiresAt = utils.Must(time.ParseDuration(env.MustGet("JWT_ID_TOKEN_EXPIRATION")))
 
 	//* set access token configs
 	tc.accessTokenIssuer = issuer
 	tc.accessTokenSecret = []byte(env.MustGet("JWT_ACCESS_TOKEN_SECRET"))
-	tc.accessTokenExpiresAt = Must(time.ParseDuration(env.MustGet("JWT_ACCESS_TOKEN_EXPIRATION")))
+	tc.accessTokenExpiresAt = utils.Must(time.ParseDuration(env.MustGet("JWT_ACCESS_TOKEN_EXPIRATION")))
 
 	//* set refresh tokens configs
 	tc.refreshTokenIssuer = issuer
 	tc.refreshTokenSecret = []byte(env.MustGet("JWT_REFRESH_TOKEN_SECRET"))
-	tc.refreshTokenExpiresAt = Must(time.ParseDuration(env.MustGet("JWT_REFRESH_TOKEN_EXPIRATION")))
+	tc.refreshTokenExpiresAt = utils.Must(time.ParseDuration(env.MustGet("JWT_REFRESH_TOKEN_EXPIRATION")))
 
 	return tc
 }

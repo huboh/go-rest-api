@@ -1,11 +1,13 @@
-package main
+// Package json provides utilities for working with JSON in HTTP responses.
+package json
 
 import (
-	"encoding/json"
+	jsonEncoder "encoding/json"
 	"net/http"
 )
 
-func SendJson(w http.ResponseWriter, data Response) {
+// Write writes a JSON response to the provided http.ResponseWriter.
+func Write(w http.ResponseWriter, data Response) {
 	if data.StatusCode < 100 {
 		data.StatusCode = http.StatusOK
 	}
@@ -28,5 +30,5 @@ func SendJson(w http.ResponseWriter, data Response) {
 
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(data.StatusCode)
-	json.NewEncoder(w).Encode(data)
+	jsonEncoder.NewEncoder(w).Encode(data)
 }

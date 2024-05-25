@@ -1,1 +1,1 @@
-# Example Repo - Go Rest API Using Only Standard Lib
+# Go Rest API Server Using Only HTTP Standard Lib

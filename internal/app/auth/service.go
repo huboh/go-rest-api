@@ -1,31 +1,27 @@
-package main
+package auth
 
-type AuthResponse struct {
-	Tokens AuthToken `json:"tokens"`
-}
-
-func Login() (AuthResponse, error) {
+func login() (loginResponse, error) {
 	tokens := NewTokenConfigs()
 	authTokens, err := tokens.CreateAuthToken("userId")
 
 	if err != nil {
-		return AuthResponse{}, err
+		return loginResponse{}, err
 	}
 
-	return AuthResponse{
+	return loginResponse{
 		Tokens: *authTokens,
 	}, nil
 }
 
-func SignUp() (AuthResponse, error) {
+func signUp() (signupResponse, error) {
 	tokens := NewTokenConfigs()
 	authTokens, err := tokens.CreateAuthToken("userId")
 
 	if err != nil {
-		return AuthResponse{}, err
+		return signupResponse{}, err
 	}
 
-	return AuthResponse{
+	return signupResponse{
 		Tokens: *authTokens,
 	}, nil
 }

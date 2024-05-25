@@ -1,4 +1,4 @@
-package main
+package json
 
 // Status is the response status.
 type Status string
@@ -9,7 +9,7 @@ const (
 	StatusSuccess = Status("success")
 )
 
-// Response represent the api response object.
+// Response represent the response object.
 type Response struct {
 	// Status is the response status. either "success" or "error".
 	Status Status `json:"status"`
@@ -24,11 +24,11 @@ type Response struct {
 	Data any `json:"data,omitempty"`
 
 	// Error is the response error. this field is omitted from the response if it is nil.
-	Error *ResponseError `json:"error,omitempty"`
+	Error *Error `json:"error,omitempty"`
 }
 
-// Response represent the api error response object.
-type ResponseError struct {
+// Error represent the response error object.
+type Error struct {
 	// Name is the name of the error.
 	Name string `json:"name,omitempty"`
 
@@ -42,8 +42,8 @@ type ResponseError struct {
 	Message string `json:"message,omitempty"`
 }
 
-func NewJsonResponseError(msg string, name string, cause string, stack string) *ResponseError {
-	return &ResponseError{
+func NewError(name string, msg string, cause string, stack string) *Error {
+	return &Error{
 		Message: msg,
 		Cause:   cause,
 		Stack:   stack,
@@ -52,6 +52,6 @@ func NewJsonResponseError(msg string, name string, cause string, stack string) *
 }
 
 // Error makes ResponseError meets the error interface
-func (re *ResponseError) Error() string {
+func (re *Error) Error() string {
 	return re.Message
 }

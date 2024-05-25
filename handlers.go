@@ -1,65 +1,15 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"time"
 
-var (
-	authRouter  = NewRouter("/auth", []Middleware{}, authRoutes)
-	usersRouter = NewRouter("/users", []Middleware{}, usersRoutes)
+	"github.com/huboh/go-rest-api/internal/pkg/json"
 )
 
-var (
-	authRoutes = []Route{
-		{
-			Path:   "/login",
-			Method: http.MethodPost,
-			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp, err := Login()
-
-				if err != nil {
-					SendJson(w, Response{
-						Error: &ResponseError{
-							Message: err.Error(),
-						},
-					})
-					return
-				}
-
-				SendJson(w, Response{
-					Data: resp,
-				})
-			}),
-		},
-		{
-			Path:   "/signup",
-			Method: http.MethodPost,
-			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				resp, err := SignUp()
-
-				if err != nil {
-					SendJson(w, Response{
-						Error: &ResponseError{
-							Message: err.Error(),
-						},
-					})
-					return
-				}
-
-				SendJson(w, Response{
-					Data: resp,
-				})
-			}),
-		},
-	}
-
-	usersRoutes = []Route{
-		{
-			Path:   "/",
-			Method: http.MethodGet,
-			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				SendJson(w, Response{
-					Data: nil,
-				})
-			}),
-		},
-	}
-)
+func handleGetHealthz(w http.ResponseWriter, r *http.Request) {
+	// panic("hello")
+	json.Write(w, json.Response{
+		Data: time.Now().Format(time.RFC3339),
+	})
+}

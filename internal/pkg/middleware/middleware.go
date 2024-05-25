@@ -1,19 +1,22 @@
-package main
+// Package middleware provides functions that add additional functionality to HTTP handlers.
+package middleware
 
 import (
 	"log"
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/huboh/go-rest-api/internal/pkg/json"
 )
 
 // Middleware is a function that adds additional functionality
 // to an http.Handler instance.
 type Middleware func(http.Handler) http.Handler
 
-// LoggerMiddleware is a middleware function that logs each incoming HTTP request and
+// Logger is a middleware function that logs each incoming HTTP request and
 // the time it took to write back a response.
-func LoggerMiddleware(next http.Handler) http.Handler {
+func Logger(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			now := time.Now()
@@ -24,11 +27,11 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 	)
 }
 
-// PanicHandlerMiddleware is a middleware function that recovers from panics in the request handling chain.
+// PanicRecoverer is a middleware function that recovers from panics in the request handling chain.
 //
 // If a panic occurs, it captures the panic value, logs an appropriate error message, and sends a JSON response
 // with an internal server error status.
-func PanicHandlerMiddleware(next http.Handler) http.Handler {
+func PanicRecoverer(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
@@ -45,9 +48,9 @@ func PanicHandlerMiddleware(next http.Handler) http.Handler {
 						msg = "unknown error"
 					}
 
-					SendJson(w, Response{
+					json.Write(w, json.Response{
 						StatusCode: http.StatusInternalServerError,
-						Error: &ResponseError{
+						Error: &json.Error{
 							Stack:   string(debug.Stack()),
 							Message: msg,
 						},

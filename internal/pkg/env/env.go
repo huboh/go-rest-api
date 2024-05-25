@@ -1,23 +1,27 @@
-package main
+// Package env provides utilities for working with environment variables.
+package env
 
 import (
 	"fmt"
 	"os"
 
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/joho/godotenv"
 )
-
-type Env struct{}
 
 // Get retrieves the value of the environment variable named by the key.
 // just like `os.Getenv()`
-func (e *Env) Get(key string) string {
+func Get(key string) string {
 	return os.Getenv(key)
+}
+
+// Load parses env files and loaded then into ENV for this process
+func Load() error {
+	return godotenv.Load()
 }
 
 // MustGet retrieves the value of the environment variable named by the key.
 // It panics when the value is empty or unset.
-func (e *Env) MustGet(key string) string {
+func MustGet(key string) string {
 	val := os.Getenv(key)
 
 	if val == "" {
