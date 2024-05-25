@@ -18,6 +18,10 @@ func SendJson(w http.ResponseWriter, data Response) {
 		}
 	}
 
+	if data.Error != nil {
+		data.Status = StatusError
+	}
+
 	if data.Message == "" {
 		data.Message = http.StatusText(data.StatusCode)
 	}
