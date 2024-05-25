@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"runtime/debug"
 	"time"
 )
 
@@ -47,6 +48,7 @@ func PanicHandlerMiddleware(next http.Handler) http.Handler {
 					SendJson(w, Response{
 						StatusCode: http.StatusInternalServerError,
 						Error: &ResponseError{
+							Stack:   string(debug.Stack()),
 							Message: msg,
 						},
 					})

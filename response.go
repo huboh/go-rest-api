@@ -36,13 +36,13 @@ type ResponseError struct {
 	Cause string `json:"cause,omitempty"`
 
 	// Stack is the error stack trace.
-	Stack []string `json:"stack,omitempty"`
+	Stack string `json:"stack,omitempty"`
 
 	// Message is the error message
 	Message string `json:"message,omitempty"`
 }
 
-func NewJsonResponseError(msg string, name string, cause string, stack []string) *ResponseError {
+func NewJsonResponseError(msg string, name string, cause string, stack string) *ResponseError {
 	return &ResponseError{
 		Message: msg,
 		Cause:   cause,
