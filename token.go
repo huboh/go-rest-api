@@ -1,12 +1,19 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/joho/godotenv/autoload"
+)
+
+var (
+	// ErrInvalidToken is returned when verifying/validating a Jwt
+	ErrInvalidToken = errors.New("invalid token")
 )
 
 // Jwt represents a JWT token as a string.
@@ -100,6 +107,30 @@ func (tc *TokenConfigs) createToken(p string, s []byte, d time.Duration) (Jwt, J
 	return Jwt(token), JwtExp(expAt.Unix()), nil
 }
 
+// verifyToken parses and validates a given token string using the provided secret.
+//
+// return ErrInvalidToken when t is invalid
+func (tc *TokenConfigs) verifyToken(t string, s []byte) (*jwt.RegisteredClaims, error) {
+	claims := &jwt.RegisteredClaims{}
+	getSecret := func(token *jwt.Token) (any, error) {
+		return s, nil
+	}
+
+	token, err := jwt.ParseWithClaims(t, claims, getSecret)
+
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrInvalidToken, err)
+	}
+
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
+
+	if !ok && !token.Valid {
+		return nil, ErrInvalidToken
+	}
+
+	return claims, nil
+}
+
 // CreateIdToken generates an ID token using the provided payload and the configurations set in TokenConfigs.
 func (tc *TokenConfigs) CreateIdToken(payload string) (*IdToken, error) {
 	token, expAt, err := tc.createToken(payload, tc.idTokenSecret, tc.idTokenExpiresAt)
@@ -114,35 +145,52 @@ func (tc *TokenConfigs) CreateIdToken(payload string) (*IdToken, error) {
 	}, nil
 }
 
+// VerifyIdToken validates and parses a given token string into an ID token.
+//
+// return ErrInvalidToken when t is invalid
+func (tc *TokenConfigs) VerifyIdToken(token string) (*IdToken, error) {
+	claims, err := tc.verifyToken(token, tc.idTokenSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IdToken{
+		IdToken:      Jwt(token),
+		IdTokenExpAt: JwtExp(claims.ExpiresAt.Unix()),
+	}, nil
+}
+
 // CreateAuthToken generates an access token and a refresh token concurrently using the provided payload
 // and the configurations set in TokenConfigs.
 func (tc *TokenConfigs) CreateAuthToken(payload string) (*AuthToken, error) {
-	var (
-		wg        sync.WaitGroup
-		errChan   = make(chan error, 2)
-		authToken AuthToken
-	)
+	wg := sync.WaitGroup{}
+	errChan := make(chan error, 2)
+	authToken := AuthToken{}
 
 	wg.Add(2)
 
+	// generate access token
 	go func() {
 		defer wg.Done()
 
 		token, expAt, err := tc.createToken(payload, tc.accessTokenSecret, tc.accessTokenExpiresAt)
 		if err != nil {
 			errChan <- err
+			return
 		}
 
 		authToken.AccessToken = token
 		authToken.AccessTokenExpAt = expAt
 	}()
 
+	// generate refresh token
 	go func() {
 		defer wg.Done()
 
 		token, expAt, err := tc.createToken(payload, tc.refreshTokenSecret, tc.refreshTokenExpiresAt)
 		if err != nil {
 			errChan <- err
+			return
 		}
 
 		authToken.RefreshToken = token
@@ -150,8 +198,68 @@ func (tc *TokenConfigs) CreateAuthToken(payload string) (*AuthToken, error) {
 	}()
 
 	wg.Wait()
+
+	// close so the chan loop exits
 	close(errChan)
 
+	// check errors
+	for err := range errChan {
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &authToken, nil
+}
+
+// VerifyAuthToken validates and parses a given token string into an AuthToken token.
+//
+// return ErrInvalidToken when t is invalid
+func (tc *TokenConfigs) VerifyAuthToken(aToken string, rToken string) (*AuthToken, error) {
+	wg := sync.WaitGroup{}
+	errChan := make(chan error, 2)
+	authToken := AuthToken{}
+
+	wg.Add(2)
+
+	// verify access token
+	go func() {
+		defer wg.Done()
+
+		claims, err := tc.verifyToken(aToken, tc.accessTokenSecret)
+
+		if err != nil {
+			errChan <- err
+			return
+		}
+
+		// set access token
+		authToken.AccessToken = Jwt(aToken)
+		authToken.AccessTokenExpAt = JwtExp(claims.ExpiresAt.Unix())
+	}()
+
+	// verify refresh token
+	go func() {
+		defer wg.Done()
+
+		claims, err := tc.verifyToken(rToken, tc.refreshTokenSecret)
+
+		if err != nil {
+			errChan <- err
+			return
+		}
+
+		// set refresh token
+		authToken.RefreshToken = Jwt(rToken)
+		authToken.RefreshTokenExpAt = JwtExp(claims.ExpiresAt.Unix())
+	}()
+
+	wg.Wait()
+
+	// close so the chan loop exits
+	close(errChan)
+
+	// check errors
 	for err := range errChan {
 		if err != nil {
 			return nil, err
