@@ -65,7 +65,7 @@ func NewServer(configs *ServerConfig) *Server {
 	}
 }
 
-func (s *Server) Close() error {
+func (s *Server) Stop() error {
 	if (s != nil) && (s.httpSvr != nil) {
 		return s.httpSvr.Close()
 	}
@@ -73,6 +73,6 @@ func (s *Server) Close() error {
 	return nil
 }
 
-func (s *Server) Listen() error {
+func (s *Server) Start() error {
 	return s.httpSvr.ListenAndServe()
 }

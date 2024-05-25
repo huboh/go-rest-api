@@ -3,12 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
 	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	_ "github.com/joho/godotenv/autoload"
 )
 
 var (
@@ -66,22 +64,23 @@ type TokenConfigs struct {
 // for issuer, secrets, and expiration durations.
 func NewTokenConfigs() *TokenConfigs {
 	tc := new(TokenConfigs)
-	issuer := os.Getenv("JWT_ISSUER")
+	env := new(Env)
+	issuer := env.Get("JWT_ISSUER")
 
 	//* set id token configs
 	tc.idTokenIssuer = issuer
-	tc.idTokenSecret = []byte(os.Getenv("JWT_ID_TOKEN_SECRET"))
-	tc.idTokenExpiresAt = Must(time.ParseDuration(os.Getenv("JWT_ID_TOKEN_EXPIRATION")))
+	tc.idTokenSecret = []byte(env.MustGet("JWT_ID_TOKEN_SECRET"))
+	tc.idTokenExpiresAt = Must(time.ParseDuration(env.MustGet("JWT_ID_TOKEN_EXPIRATION")))
 
 	//* set access token configs
 	tc.accessTokenIssuer = issuer
-	tc.accessTokenSecret = []byte(os.Getenv("JWT_ACCESS_TOKEN_SECRET"))
-	tc.accessTokenExpiresAt = Must(time.ParseDuration(os.Getenv("JWT_ACCESS_TOKEN_EXPIRATION")))
+	tc.accessTokenSecret = []byte(env.MustGet("JWT_ACCESS_TOKEN_SECRET"))
+	tc.accessTokenExpiresAt = Must(time.ParseDuration(env.MustGet("JWT_ACCESS_TOKEN_EXPIRATION")))
 
 	//* set refresh tokens configs
 	tc.refreshTokenIssuer = issuer
-	tc.refreshTokenSecret = []byte(os.Getenv("JWT_REFRESH_TOKEN_SECRET"))
-	tc.refreshTokenExpiresAt = Must(time.ParseDuration(os.Getenv("JWT_REFRESH_TOKEN_EXPIRATION")))
+	tc.refreshTokenSecret = []byte(env.MustGet("JWT_REFRESH_TOKEN_SECRET"))
+	tc.refreshTokenExpiresAt = Must(time.ParseDuration(env.MustGet("JWT_REFRESH_TOKEN_EXPIRATION")))
 
 	return tc
 }

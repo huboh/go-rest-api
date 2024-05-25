@@ -5,33 +5,25 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	env "github.com/joho/godotenv"
 )
 
 func start() error {
-	if err := env.Load(); err != nil {
-		return err
-	}
-
-	var (
-		host   = os.Getenv("HOST")
-		port   = os.Getenv("PORT")
-		router = NewRouter("/", getMiddlewares(), getRoutes())
-		server = NewServer(
-			NewServerConfig(
-				host,
-				port,
-				router,
-			),
-		)
+	host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
+	router := NewRouter("/", getMiddlewares(), getRoutes())
+	server := NewServer(
+		NewServerConfig(
+			host,
+			port,
+			router,
+		),
 	)
 
-	defer server.Close()
+	defer server.Stop()
 
 	log.Println("server listening on", server.httpSvr.Addr)
 
-	if err := server.Listen(); err != nil {
+	if err := server.Start(); err != nil {
 		return err
 	}
 
