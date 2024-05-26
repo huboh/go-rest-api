@@ -25,3 +25,16 @@ func signUp() (signupResponse, error) {
 		Tokens: *authTokens,
 	}, nil
 }
+
+func refresh() (refreshResponse, error) {
+	tokens := NewTokenConfigs()
+	authTokens, err := tokens.CreateAuthToken("userId")
+
+	if err != nil {
+		return refreshResponse{}, err
+	}
+
+	return refreshResponse{
+		Tokens: *authTokens,
+	}, nil
+}

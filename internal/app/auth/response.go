@@ -7,3 +7,7 @@ type loginResponse struct {
 type signupResponse struct {
 	Tokens AuthToken `json:"tokens"`
 }
+
+type refreshResponse struct {
+	Tokens AuthToken `json:"tokens"`
+}

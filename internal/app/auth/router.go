@@ -27,6 +27,11 @@ var (
 				Method:  http.MethodPost,
 				Handler: http.HandlerFunc(handleSignup),
 			},
+			{
+				Path:    "/refresh",
+				Method:  http.MethodPost,
+				Handler: http.HandlerFunc(handleRefresh),
+			},
 		},
 	)
 )
