@@ -1,6 +1,6 @@
 package auth
 
-func login() (loginResponse, error) {
+func login(c loginCredentials) (loginResponse, error) {
 	tokens := NewTokenConfigs()
 	authTokens, err := tokens.CreateAuthToken("userId")
 

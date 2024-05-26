@@ -7,35 +7,64 @@ import (
 )
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
-	resp, err := login()
+	var (
+		err   error
+		creds loginCredentials
+	)
+
+	err = json.UnmarshalBody(r, &creds)
 
 	if err != nil {
 		json.Write(w, json.Response{
-			Error: &json.Error{
-				Message: err.Error(),
-			},
+			StatusCode: http.StatusBadRequest,
+			Error:      json.ErrorFromErr(err, "", ""),
+		})
+		return
+	}
+
+	result, err := login(creds)
+
+	if err != nil {
+		json.Write(w, json.Response{
+			StatusCode: http.StatusBadRequest,
+			Error:      json.ErrorFromErr(err, "", ""),
 		})
 		return
 	}
 
 	json.Write(w, json.Response{
-		Data: resp,
+		Data: result,
 	})
 }
 
 func handleSignup(w http.ResponseWriter, r *http.Request) {
-	resp, err := signUp()
+	result, err := signUp()
 
 	if err != nil {
 		json.Write(w, json.Response{
-			Error: &json.Error{
-				Message: err.Error(),
-			},
+			StatusCode: http.StatusBadRequest,
+			Error:      json.ErrorFromErr(err, "", ""),
 		})
 		return
 	}
 
 	json.Write(w, json.Response{
-		Data: resp,
+		Data: result,
+	})
+}
+
+func handleRefresh(w http.ResponseWriter, r *http.Request) {
+	result, err := refresh()
+
+	if err != nil {
+		json.Write(w, json.Response{
+			StatusCode: http.StatusBadRequest,
+			Error:      json.ErrorFromErr(err, "", ""),
+		})
+		return
+	}
+
+	json.Write(w, json.Response{
+		Data: result,
 	})
 }
