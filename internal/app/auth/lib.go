@@ -1,7 +1,10 @@
 package auth
 
+var (
+	tokens = NewTokenConfigs()
+)
+
 func login(c loginCredentials) (loginResponse, error) {
-	tokens := NewTokenConfigs()
 	authTokens, err := tokens.CreateAuthToken("userId")
 
 	if err != nil {
@@ -14,7 +17,6 @@ func login(c loginCredentials) (loginResponse, error) {
 }
 
 func signUp() (signupResponse, error) {
-	tokens := NewTokenConfigs()
 	authTokens, err := tokens.CreateAuthToken("userId")
 
 	if err != nil {
@@ -27,7 +29,6 @@ func signUp() (signupResponse, error) {
 }
 
 func refresh() (refreshResponse, error) {
-	tokens := NewTokenConfigs()
 	authTokens, err := tokens.CreateAuthToken("userId")
 
 	if err != nil {
