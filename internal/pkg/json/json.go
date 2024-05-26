@@ -1,9 +1,21 @@
-// Package json provides utilities for working with JSON in HTTP responses.
+// Package json provides utilities for working with JSON in HTTP request & responses.
 package json
 
 import (
 	jsonEncoder "encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
+
+	"github.com/huboh/go-rest-api/internal/pkg/utils"
+)
+
+const (
+	// contentTypeKey is the content type header key
+	contentTypeKey = "Content-Type"
+
+	// contentTypeVal is the json content type header value
+	contentTypeVal = "application/json"
 )
 
 // Write writes a JSON response to the provided http.ResponseWriter.
@@ -22,13 +34,40 @@ func Write(w http.ResponseWriter, data Response) {
 
 	if data.Error != nil {
 		data.Status = StatusError
+
+		if utils.IsProd() {
+			data.Error.Stack = ""
+			data.Error.Cause = ""
+		}
 	}
 
 	if data.Message == "" {
 		data.Message = http.StatusText(data.StatusCode)
 	}
 
-	w.Header().Add("Content-Type", "application/json; charset=utf-8")
+	w.Header().Add(contentTypeKey, fmt.Sprintf("%s; charset=utf-8", contentTypeVal))
 	w.WriteHeader(data.StatusCode)
 	jsonEncoder.NewEncoder(w).Encode(data)
+}
+
+// Unmarshal attempts to parse the JSON request body into v
+func UnmarshalBody(r *http.Request, v any) (err error) {
+	t := r.Header.Get(contentTypeKey)
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("json unmarshal error: %w", err)
+		}
+	}()
+
+	if strings.Split(t, ";")[0] != contentTypeVal {
+		err = fmt.Errorf("unexpected content type: \"%s\"", t)
+		return err
+	}
+
+	if err = jsonEncoder.NewDecoder(r.Body).Decode(v); err != nil {
+		return err
+	}
+
+	return nil
 }

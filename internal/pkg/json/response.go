@@ -1,5 +1,9 @@
 package json
 
+import (
+	"runtime/debug"
+)
+
 // Status is the response status.
 type Status string
 
@@ -49,6 +53,15 @@ func NewError(name string, msg string, cause string, stack string) *Error {
 		Stack:   stack,
 		Name:    name,
 	}
+}
+
+// ErrorFromErr returns a new Error only if the passed in err is not nil. it returns nil otherwise
+func ErrorFromErr(err error, name string, cause string) *Error {
+	if err == nil {
+		return nil
+	}
+
+	return NewError(name, err.Error(), cause, string(debug.Stack()))
 }
 
 // Error makes ResponseError meets the error interface
