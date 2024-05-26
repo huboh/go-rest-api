@@ -1,10 +1,14 @@
 package auth
 
+import (
+	"context"
+)
+
 var (
 	tokens = NewTokenConfigs()
 )
 
-func login(c loginCredentials) (loginResponse, error) {
+func login(ctx context.Context, creds loginCredentials) (loginResponse, error) {
 	authTokens, err := tokens.CreateAuthToken("userId")
 
 	if err != nil {
@@ -16,7 +20,7 @@ func login(c loginCredentials) (loginResponse, error) {
 	}, nil
 }
 
-func signUp() (signupResponse, error) {
+func signUp(ctx context.Context) (signupResponse, error) {
 	authTokens, err := tokens.CreateAuthToken("userId")
 
 	if err != nil {
@@ -28,7 +32,7 @@ func signUp() (signupResponse, error) {
 	}, nil
 }
 
-func refresh() (refreshResponse, error) {
+func refresh(ctx context.Context) (refreshResponse, error) {
 	authTokens, err := tokens.CreateAuthToken("userId")
 
 	if err != nil {

@@ -269,3 +269,23 @@ func (tc *TokenConfigs) VerifyAuthToken(aToken string, rToken string) (*AuthToke
 
 	return &authToken, nil
 }
+
+func (tc *TokenConfigs) VerifyAccessToken(token string) (string, error) {
+	claims, err := tc.verifyToken(token, tc.accessTokenSecret)
+
+	if err != nil {
+		return "", err
+	}
+
+	return claims.Subject, nil
+}
+
+func (tc *TokenConfigs) VerifyRefreshToken(token string) (string, error) {
+	claims, err := tc.verifyToken(token, tc.refreshTokenSecret)
+
+	if err != nil {
+		return "", err
+	}
+
+	return claims.Subject, nil
+}

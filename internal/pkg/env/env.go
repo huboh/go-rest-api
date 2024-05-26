@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 // Get retrieves the value of the environment variable named by the key.

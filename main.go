@@ -70,6 +70,9 @@ func getRoutes() []router.Route {
 
 func getMiddlewares() []middleware.Middleware {
 	return []middleware.Middleware{
+		// auth middlewares
+		auth.AuthGuardMiddleware,
+
 		// standard middlewares
 		middleware.PanicRecoverer,
 		middleware.Logger,

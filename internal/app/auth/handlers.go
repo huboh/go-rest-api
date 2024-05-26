@@ -22,7 +22,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := login(creds)
+	result, err := login(r.Context(), creds)
 
 	if err != nil {
 		json.Write(w, json.Response{
@@ -38,7 +38,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSignup(w http.ResponseWriter, r *http.Request) {
-	result, err := signUp()
+	result, err := signUp(r.Context())
 
 	if err != nil {
 		json.Write(w, json.Response{
@@ -54,7 +54,7 @@ func handleSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRefresh(w http.ResponseWriter, r *http.Request) {
-	result, err := refresh()
+	result, err := refresh(r.Context())
 
 	if err != nil {
 		json.Write(w, json.Response{
