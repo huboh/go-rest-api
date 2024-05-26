@@ -2,6 +2,7 @@
 package middleware
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -25,6 +26,29 @@ func Logger(next http.Handler) http.Handler {
 			log.Printf("Request: %s %s took %s\n", r.Method, r.URL.Path, time.Since(now))
 		},
 	)
+}
+
+// GetTimeoutMiddleware is a function that returns a middleware function that
+func GetTimeoutMiddleware(d time.Duration) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) {
+				ctx, cancel := context.WithTimeout(
+					// get request's original context
+					r.Context(),
+
+					// pass the duration
+					d,
+				)
+
+				// release resources associated with this ctx when func exits
+				defer cancel()
+
+				// serve http requests with a new request with context timeout set to d
+				next.ServeHTTP(w, r.WithContext(ctx))
+			},
+		)
+	}
 }
 
 // PanicRecoverer is a middleware function that recovers from panics in the request handling chain.

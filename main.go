@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/huboh/go-rest-api/internal/app/auth"
 	"github.com/huboh/go-rest-api/internal/app/user"
@@ -69,7 +70,9 @@ func getRoutes() []router.Route {
 
 func getMiddlewares() []middleware.Middleware {
 	return []middleware.Middleware{
+		// standard middlewares
 		middleware.PanicRecoverer,
 		middleware.Logger,
+		middleware.GetTimeoutMiddleware(time.Minute * 3),
 	}
 }
