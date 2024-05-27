@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  api:
+    image: huboh/go-rest-api:latest
+    container_name: go-rest-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - 8000:${PORT}
